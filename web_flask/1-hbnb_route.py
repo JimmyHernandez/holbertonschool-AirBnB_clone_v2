@@ -9,12 +9,16 @@ app = Flask(__name__)
 
 
 @app.route("/", strict_slashes=False)
-def hello():
+def hello_holberton():
     """
     Returns 'Hello HBNB!'.
     """
     return "Hello HBNB!"
 
+@app.route("/hbnb")
+def display():
+    """ Return display "HBNB" """
+    return "HBNB"
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port="5000")
