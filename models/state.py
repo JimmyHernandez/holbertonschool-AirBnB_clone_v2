@@ -1,30 +1,32 @@
 #!/usr/bin/python3
-"""State Module for HBNB project."""
+""" State Module for HBNB project """
 from models.base_model import BaseModel, Base
+import models
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
 from models.city import City
-import os
+from os import getenv
 
 
 class State(BaseModel, Base):
-    """State class."""
-
-    __tablename__ = "states"
+    """
+    Class States
+    """
+    __tablename__ = 'states'
     name = Column(String(128), nullable=False)
 
-    if os.environ.get('HBNB_TYPE_STORAGE') != 'db':
-        cities = relationship('City', cascade='all, delete', backref='states')
-
+    if getenv('HBNB_TYPE_STORAGE') == 'db':
+        cities = relationship('City', backref='state',
+                              cascade='all, delete, delete-orphan')
     else:
+
         @property
         def cities(self):
             """
-            The function "cities" is not defined and therefore cannot be/
-            summarized.
+            Getter for cities related to a state using a FIlEStorage engine.
             """
-            from models import storage
-
-            all_cities = storage.all(City)
-            return [city for city in all_cities.values()
-                    if city.state_id == self.id]
+            st_cities = []
+            for city in models.storage.all(City).values():
+                if (self.id == city.state_id):
+                    st_cities.append(city)
+            return st_cities

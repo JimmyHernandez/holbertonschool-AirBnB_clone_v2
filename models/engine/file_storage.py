@@ -9,32 +9,44 @@ class FileStorage:
     __objects = {}
 
     def all(self, cls=None):
-        """Returns a dictionary or filtered list of models in storage"""
+        """Returns a dictionary of models currently in storage, if a class
+        is specified, it returns of objects of said class"""
         if cls is None:
             return FileStorage.__objects
-        else:
-            filtered_objects = {}
-            for key, value in FileStorage.__objects.items():
-                class_name = key.split('.')[0]
-                if class_name == cls.__name__:
-                    filtered_objects[key] = value
-            return filtered_objects
+        dir_same_cls = {}
+        for k, v in FileStorage.__objects.items():
+            if v.__class__ == cls:
+                dir_same_cls[k] = v
+        return dir_same_cls
 
     def new(self, obj):
-        """Adds a new object to the storage dictionary"""
+        """Adds new object to storage dictionary"""
         self.all().update({obj.to_dict()['__class__'] + '.' + obj.id: obj})
 
     def save(self):
-        """Saves the storage dictionary to a file"""
+        """Saves storage dictionary to file"""
         with open(FileStorage.__file_path, 'w') as f:
             temp = {}
             temp.update(FileStorage.__objects)
             for key, val in temp.items():
                 temp[key] = val.to_dict()
-            json.dump(temp, f, indent=2)
+            json.dump(temp, f)
+
+    def delete(self, obj=None):
+        """Deletes an object from the storage"""
+        if obj is None:
+            return
+
+        key = obj.to_dict()['__class__'] + '.' + obj.id
+        if key in FileStorage.__objects:
+            del FileStorage.__objects[key]
+
+    def close(self):
+        """Method for closing Flask connection"""
+        self.reload()
 
     def reload(self):
-        """Loads the storage dictionary from a file"""
+        """Load storage dictionary from file"""
         from models.base_model import BaseModel
         from models.user import User
         from models.place import Place
@@ -44,10 +56,10 @@ class FileStorage:
         from models.review import Review
 
         classes = {
-            'BaseModel': BaseModel, 'User': User, 'Place': Place,
-            'State': State, 'City': City, 'Amenity': Amenity,
-            'Review': Review
-        }
+                    'BaseModel': BaseModel, 'User': User, 'Place': Place,
+                    'State': State, 'City': City, 'Amenity': Amenity,
+                    'Review': Review
+                  }
         try:
             temp = {}
             with open(FileStorage.__file_path, 'r') as f:
@@ -56,15 +68,3 @@ class FileStorage:
                     self.all()[key] = classes[val['__class__']](**val)
         except FileNotFoundError:
             pass
-
-    def delete(self, obj=None):
-        """Deletes an object from the storage if it exists"""
-        if obj is not None:
-            key = obj.__class__.__name__ + '.' + obj.id
-            if key in FileStorage.__objects:
-                del FileStorage.__objects[key]
-
-    def close(self):
-        """call reload() method
-        """
-        self.reload()
