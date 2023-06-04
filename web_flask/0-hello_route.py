@@ -1,15 +1,15 @@
 #!/usr/bin/python3
-"""_summary_
-
-    Returns:
-        _type_: _description_
+"""scrip that runs a flask app
     """
 from flask import Flask
 
 app = Flask(__name__)
 
-@app.route("/")
+@app.route("/", strict_slashes=False)
 def hello():
+    """Display Hello HBNB!
+    """
     return “Hello HBNB!”
 
-
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port="5000")
