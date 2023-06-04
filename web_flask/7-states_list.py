@@ -14,12 +14,12 @@ def states_list():
     """
     Displays HTML page.
     """
-    states = storage.all("State")
+    states = storage.all("State").values()
     return render_template("7-states_list.html", states=states)
 
 
 @app.teardown_appcontext
-def teardown(exc):
+def teardown_appcontext(exception):
     """
     Removes current SQLAlchemy session.
     """
