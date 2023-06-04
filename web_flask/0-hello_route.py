@@ -1,15 +1,20 @@
 #!/usr/bin/python3
-"""scrip that runs a flask app
-    """
+"""
+Script that starts a Flask application.
+"""
 from flask import Flask
+
 
 app = Flask(__name__)
 
+
 @app.route("/", strict_slashes=False)
-def hello():
-    """Display Hello HBNB!
+def hello_holberton():
     """
-    return “Hello HBNB!”
+    Returns 'Hello HBNB!'.
+    """
+    return "Hello HBNB!"
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port="5000")
